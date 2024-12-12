@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Monitor Kolam IOT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=2">
+    <title>Biofloc IoT</title>
 
     <!-- include Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
@@ -53,23 +53,83 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <!--reference a stylesheet-->
     <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+      .allcontainer{
+         display: flex;
+      }
+      .sidebar {
+          width: 250px;
+          background-color: #049faa;
+          color: white; 
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          height: 300vh;
+          max-height: 300%;
+          margin-right: 100px;
+      }
 
+      .sidebar a {
+          color: white;
+          text-decoration: none;
+          margin: 10px 0;
+          padding: 10px;
+          background-color: #34495e;
+          border-radius: 5px;
+          text-align: center;
+          cursor: pointer;
+      }
+
+      .sidebar a:hover {
+          background-color: #084044;
+      }
+
+      .content {
+          flex-grow: 1;
+          padding: 20px;
+      }
+
+      .topnav {
+          background-color: #049faa;
+          padding: 10px;
+          color: white;
+          text-align: center;
+      }
+      #loading-indicator {
+        position: fixed;
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 9999;
+      }
+      .spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
 
   <body>
 
     <!--TOP BAR-->
     <div class="topnav">
-      <h1>Kolam IOT <i class="fas fa-clipboard-list"></i></h1>
+      <h1>Biofloc IoT 
+        <img src="favicon.png" alt="Biofloc Icon" style="vertical-align: middle; height: 32px;">
+      </h1>
     </div>
+    
 
     <!--AUTHENTICATION BAR (USER DETAILS/LOGOUT BUTTON)-->
-    <div id="authentication-bar" style="display: none;">
-      <p><span id="authentication-status">Pengguna berhasil masuk</span>
-        <span id="user-details">USEREMAIL</span>
-        <a href="/" id="logout-link">(logout)</a>
-      </p>
-    </div>
+
 
     <!--LOGIN FORM-->
     <form id="login-form" style="display: none;">
@@ -86,17 +146,29 @@
       <br>
       <br>
       <br>
-      <p>admin@web.app|admin123</p>
+      <!-- <p>dimasbayu.bm@gmail.com|123456</p> -->
     </form>
-
+    <div class="allcontainer">
+      
+    <div id="sidecontent-sign-in" style="display: none;">
+      <div class="sidebar">
+        <a onclick="loadContent('card')">Dashboard</a>
+        <a onclick="loadContent('gauge')">Gauge</a>
+        <a onclick="loadContent('chart')">Chart</a>
+        <a onclick="loadContent('datatable')" >Log Data</a>
+        
+        <a href="/" id="logout-link" style="margin-top:160px ; background-color: #aa151a;">Logout</a>
+      </div>
+    </div>
+    
     <!--CONTENT (SENSOR READINGS)-->
+    
+    <div id="sidecontent-sign-in" style="display: none;"><p>a</p></div>
     <div class="content-sign-in" id="content-sign-in" style="display: none;">
-
-      <!--LAST UPDATE-->
-      <p><span class ="date-time">Last update: <span id="lastUpdate"></span></span></p>
-      <p>
+      <div style="height:60px;"></div>
+      <p  style="display:none">
         Cards: <input type="checkbox" id="cards-checkbox" name="cards-checkbox" checked>
-        Gauges: <input type="checkbox" id="gauges-checkbox" name="gauges-checkbox" checked>
+        Gauges: <input type="checkbox" id="gauges-checkbox" name="gauges-checkbox" unchecked>
         Charts: <input type="checkbox" id="charts-checkbox" name="charts-checkbox" unchecked>
       </p>
       <div id="cards-div">
@@ -116,27 +188,62 @@
             <p><i class="fas fa-angle-double-down" style="color:#e1e437;"></i> PH </p>
             <p><span class="reading"><span id="pres"></span> pH </span></p>
           </div>
-        </div>
-      </div>
-      <!--GAUGES-->
-      <div id ="gauges-div">
-        <div class="cards">
-          <!--TEMPERATURE-->
+          
           <div class="card">
-            <canvas id="gauge-temperature"></canvas>
+            <p><i class="fas fa-thermometer-half" style="color:#059e8a;"></i> TEMPERATURE</p>
+            <p><span class="reading"><span id="tempText"></span></span></p>
           </div>
           <!--HUMIDITY-->
           <div class="card">
-            <canvas id="gauge-humidity"></canvas>
+            <p><i class="fas fa-tint" style="color:#00add6;"></i> TURBIDITY </p>
+            <p><span class="reading"><span id="humText"></span></span></p>
           </div>
+          <!--PRESSURE-->
+          <div class="card">
+            <p><i class="fas fa-angle-double-down" style="color:#e1e437;"></i> PH </p>
+            <p><span class="reading"><span id="presText"></span></span></p>
+          </div>
+        </div>
+      </div>
+      <!--GAUGES-->
+      <div id ="gauges-div" style= "display:none;">
+        <div class="cards2">
+          <!--TEMPERATURE-->
+          <!-- <div class="card"> -->
+            <canvas id="gauge-temperature"></canvas>
+          <!-- </div> -->
+          <!--HUMIDITY-->
+          <!-- <div class="card"> -->
+            <canvas id="gauge-humidity"></canvas>
+          <!-- </div> -->
+          <!-- <div class="card"> -->
+            <div></div>
+            <canvas id="gauge-pressure"></canvas>
+          <!-- </div> -->
         </div>
       </div>
 
       <!--CHARTS-->
-      <div id="charts-div" style="display:none">
+      <div id="charts-div" style= "display:none; width:700px" >
         <!--SET NUMBER OF READINGS INPUT FIELD-->
+        <!-- <div style= "display:none"> -->
+          
         <div>
-          <p> Pilih jumlah data yang ditampilkan: <input type="number" id="charts-range"></p>
+          <p> Jumlah datapoint yang ditampilkan: <input type="number" id="charts-range"></p>
+        </div>
+          <p>Range hari yang ditampilkan: 
+            <select id="charts-dayrange">
+              <option value="0.04">1 Jam</option>
+              <option value="0.08">2 Jam</option>
+              <option value="0.5">12 Jam</option>
+              <option value="1">1 Hari</option>
+              <option value="2">2 Hari</option>
+              <option value="7">7 Hari</option>
+            </select>
+          </p>
+        <div id="loading-indicator" style="display: none;">
+          <div class="spinner"></div>
+          <p>Loading data...</p>
         </div>
         <!--TEMPERATURE-CHART-->
         <div class="cards">
@@ -162,56 +269,93 @@
       </div>
 
     <!--BUTTONS TO HANDLE DATA-->
-    <p>
-      <!--View data button-->
-      <button id="view-data-button">Lihat semua data</button>
-      <!--Hide data button-->
-      <button id="hide-data-button" style= "display:none;">Sembunyikan data</button>
-      <!--export data button-->
-      <button id="export-button">Simpan sebagai CSV</button>
-      <!--Delete data button-->
-      <button id="delete-button" class="deletebtn">Hapus data</button>
-    </p>
-    <!--Modal to delete data-->
-    <div id="delete-modal" class="modal" sytle="display:none">
-      <span onclick = "document.getElementById('delete-modal').style.display='none'" class="close" title="Close Modal">×</span>
-      <form id= "delete-data-form" class="modal-content" action="/">
-        <div class="container">
-          <h1>Hapus Data</h1>
-          <p>Anda yakin akan menghapus semua data dari database?</p>
-          <div class="clearfix">
-            <button type="button" onclick="document.getElementById('delete-modal').style.display='none'" class="cancelbtn">Batal</button>
-            <button type="submit" onclick="document.getElementById('delete-modal').style.display='none'" class="deletebtn">Hapus</button>
+    
+    <div id="datatable-div" style= "display:none;">
+      <p>
+        <!--View data button-->
+        <button id="view-data-button">Lihat semua data</button>
+        <!--Hide data button-->
+        <button id="hide-data-button" style= "display:none;">Sembunyikan data</button>
+        <!--export data button-->
+        <button id="export-button">Simpan sebagai CSV</button>
+        <!--Delete data button-->
+        <button id="delete-button" class="deletebtn">Hapus data</button>
+      </p>
+      <!--Modal to delete data-->
+      <div id="delete-modal" class="modal" sytle="display:none">
+        <span onclick = "document.getElementById('delete-modal').style.display='none'" class="close" title="Close Modal">×</span>
+        <form id= "delete-data-form" class="modal-content" action="/">
+          <div class="container">
+            <h1>Hapus Data</h1>
+            <p>Anda yakin akan menghapus semua data dari database?</p>
+            <div class="clearfix">
+              <button type="button" onclick="document.getElementById('delete-modal').style.display='none'" class="cancelbtn">Batal</button>
+              <button type="submit" onclick="document.getElementById('delete-modal').style.display='none'" class="deletebtn">Hapus</button>
+            </div>
           </div>
+        </form>
+      </div>
+  
+      <!--TABLE WITH ALL DATA-->
+      <div class ="cards">
+        <div class="card" id="table-container" style= "display:none;">
+          <table id="readings-table">
+              <tr id="theader">
+                <th>Timestamp</th>
+                <th>Temp (ºC)</th>
+                <th>Turb (NTU)</th>
+                <th>pH</th>
+              </tr>
+              <tbody id="tbody">
+              </tbody>
+          </table>
+          <p><button id="load-data" style= "display:none;">Tanpilkan lebih banyak ...</button></p>
         </div>
-      </form>
-    </div>
-
-    <!--TABLE WITH ALL DATA-->
-    <div class ="cards">
-      <div class="card" id="table-container" style= "display:none;">
-        <table id="readings-table">
-            <tr id="theader">
-              <th>Timestamp</th>
-              <th>Temp (ºC)</th>
-              <th>Turb (NTU)</th>
-              <th>pH </th>
-            </tr>
-            <tbody id="tbody">
-            </tbody>
-        </table>
-        <p><button id="load-data" style= "display:none;">Tanpilkan lebih banyak ...</button></p>
+      </div>
+      <div id="authentication-bar" style="display: none;">
+        <!--LAST UPDATE-->
+        <p><span class ="date-time">Last update: <span id="lastUpdate"></span></span></p>
+        <p><span id="authentication-status">Email Perangkat Pengguna</span>
+          <span id="user-details">USEREMAIL</span>
+        </p>
       </div>
     </div>
+        
 
   </div>
+</div>
 
     <!--INCLUDE JS FILES-->
     <script src="auth.js"></script>
     <script src="charts-definition.js"></script>
     <script src="gauges-definition.js"></script>
     <script src="index.js"></script>
-
+    <script>
+      function loadContent(page) {
+          const content = document.getElementById('dynamic-content');
+          if (page === 'gauge') {
+                gaugesReadingsElement.style.display = 'block';
+                cardsReadingsElement.style.display = 'none';
+                chartsDivElement.style.display = 'none'; 
+                datatableDivElement.style.display = 'none';    
+          } else if (page === 'card') {
+                gaugesReadingsElement.style.display = 'none';
+                cardsReadingsElement.style.display = 'block';
+                chartsDivElement.style.display = 'none';    
+                datatableDivElement.style.display = 'none'; 
+          } else if (page === 'chart') {
+                gaugesReadingsElement.style.display = 'none';
+                cardsReadingsElement.style.display = 'none';
+                chartsDivElement.style.display = 'block';   
+                datatableDivElement.style.display = 'none';  
+          } else if (page === 'datatable') {
+                gaugesReadingsElement.style.display = 'none';
+                cardsReadingsElement.style.display = 'none';
+                chartsDivElement.style.display = 'none';   
+                datatableDivElement.style.display = 'block';  
+          }
+      }
+    </script>
   </body>
 
 </html>

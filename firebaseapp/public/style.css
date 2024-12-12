@@ -45,6 +45,14 @@ body {
     grid-gap: 2rem;
     grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
 }
+.cards2 {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    display: grid;
+    grid-gap: 1;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
+}
 
 .reading {
     color: #193036;

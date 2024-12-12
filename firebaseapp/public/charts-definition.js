@@ -7,6 +7,7 @@ function onload(event){
   chartP = createPressureChart();
 }
 
+
 // Create Temperature Chart
 function createTemperatureChart() {
   var chart = new Highcharts.Chart({
@@ -15,7 +16,9 @@ function createTemperatureChart() {
       type: 'spline' ,
       zooming: {
           type: 'x'
-      } 
+      } ,
+      panning: true,
+      panKey: 'shift'
     },
     series: [
       {
@@ -35,7 +38,10 @@ function createTemperatureChart() {
     },
     xAxis: {
       type: 'datetime',
-      dateTimeLabelFormats: { second: '%H:%M:%S' }
+      dateTimeLabelFormats: { second: '%H:%M:%S' },  // Assuming your data is time-based
+      scrollbar: {
+        enabled: true,  // Enables the scrollbar
+      }
     },
     yAxis: {
       title: { 
@@ -63,7 +69,8 @@ function createHumidityChart(){
       type: 'spline'  ,
       zooming: {
           type: 'x'
-      } 
+      } ,
+      panning: true,
     },
     series: [{
       name: 'sen0189'
@@ -112,7 +119,8 @@ function createPressureChart() {
       type: 'spline' ,
       zooming: {
           type: 'x'
-      } 
+      } ,
+      panning: true,
     },
     series: [{
       name: 'PH-4502C'
