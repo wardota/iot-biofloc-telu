@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
@@ -5,9 +6,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-// #include <Adafruit_Sensor.h>
-// #include <Adafruit_BME280.h>
 #include "time.h"
+#include <TimeLib.h>
 
 // Provide the token generation process info.
 #include "addons/TokenHelper.h"
@@ -15,15 +15,15 @@
 #include "addons/RTDBHelper.h"
 
 // Insert your network credentials
-#define WIFI_SSID "Galaxy M12D95F" 
-#define WIFI_PASSWORD "zxdh6690"
+#define WIFI_SSID "Galaxy M12D95F" //"Remboo" //
+#define WIFI_PASSWORD "zxdh6690" //"kabisatkebesit"
 
 // Insert Firebase project web API Key
 #define API_KEY "AIzaSyDyWHmUb3fVwdGHruhi0FK607qZQBw0_o4"
 
 // Insert Authorized Email and Corresponding Password
-#define USER_EMAIL "dimasbayu.bm@gmail.com"
-#define USER_PASSWORD "123456"
+#define USER_EMAIL "admin@web.app"//"dimasbayu.bm@gmail.com"
+#define USER_PASSWORD "admin123" //"123456"
 
 // Insert RTDB URLefine the RTDB URL
 #define DATABASE_URL "cms1-a0c7a.firebaseio.com"
@@ -63,14 +63,6 @@ float volt;
 unsigned long sendDataPrevMillis = 0;
 unsigned long timerDelay = 10000;
 
-// Initialize BME280
-// void initBME(){
-//   if (!bme.begin(0x76)) {
-//     Serial.println("Could not find a valid BME280 sensor, check wiring!");
-//     while (1);
-//   }
-// }
-
 // LCD setup for I2C, address 0x27, 16 columns and 2 rows
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -81,6 +73,7 @@ const int turbidityPin = 36;   // GPIO 36 for turbidity sensor (analog)  (kepake
 
 // Variables for scrolling text
 String displayText;
+String displayTime;
 int scrollPos = 0;
 unsigned long previousMillis = 0;
 const long interval = 250; // Scroll interval in milliseconds
@@ -102,6 +95,12 @@ float round_to_dp( float in_value, int decimal_place )
   float multiplier = powf( 10.0f, decimal_place );
   in_value = roundf( in_value * multiplier ) / multiplier;
   return in_value;
+}
+String twoDigits(int num) {
+  if (num < 10) {
+    return "0" + String(num);
+  }
+  return String(num);
 }
 // Initialize WiFi
 void initWiFi() {
@@ -125,7 +124,7 @@ unsigned long getTime() {
   time_t now;
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
-    //Serial.println("Failed to obtain time");
+    Serial.println("Failed to obtain time");
     return(0);
   }
   time(&now);
@@ -189,7 +188,7 @@ void setup(){
 
   // Update database path
   databasePath = "/UsersData/" + uid + "/readings";
-
+  displayTime = " ";
   //ds18B20 dallas
   sensors.begin();
 
@@ -244,17 +243,8 @@ void loop(){
     myphestimate = 0;
   }
 
-
-
-
-
   sensors.requestTemperatures(); 
   float temperatureValue = sensors.getTempCByIndex(0) + 0.2; // + 0.2 adjustment after calibration
-
-  // Serial.print ("ph Voltage: ");
-  // Serial.print (analogRead(phVolt));
-  // Serial.print (" ph nilai : ");
-  // Serial.println (phhValue);
 
   Serial.print (" ph V: ");
   Serial.print (phVoltage);
@@ -285,29 +275,8 @@ void loop(){
   if (temperatureValue<0){
     temperatureValue=0; //set 0 if temp sensor is not reading
   }
-  displayText = "pH: " + String(phValue, 2) + " NTU: " + String(ntu, 1) + " SH: " + String(temperatureValue, 1)+" C ";
-  // displayText = "pH: " + String(phValue, 2) + " NTU: " + String(turbidityValue, 1) + " SH: " + String(temperatureValue, 1)+" C ";
- 
-  // // random value //comment to disable random data
-  // phValue=random(1,10);
-  // turbidityValue=random(30,40);
-  // temperatureValue=random(20,30);
-
-  // unsigned long currentMillis = millis();
-  // if (currentMillis - previousMillis >= interval) {
-  //   previousMillis = currentMillis;
-
-  //   lcd.clear();
-  //   lcd.setCursor(0, 0);
-  //   lcd.print(displayText.substring(scrollPos, scrollPos + 16));
-  //   lcd.setCursor(0, 1);
-
-  //   scrollPos++;
-  //   if (scrollPos >= displayText.length()) {
-  //     scrollPos = 0;
-  //   }
-  // }
-
+  displayText = " | pH: " + String(phValue, 2) + " | NTU: " + String(ntu, 1) + " | Suhu: " + String(temperatureValue, 1)+" C ";
+  
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
@@ -327,6 +296,10 @@ void loop(){
     lcd.setCursor(0, 0);
     lcd.print(visibleText);
 
+    
+    lcd.setCursor(0, 1);
+    lcd.print("Sent: "+displayTime);
+
     // Increment scroll position
     scrollPos++;
     if (scrollPos >= displayText.length()) {
@@ -341,6 +314,14 @@ void loop(){
 
     //Get current timestamp
     timestamp = getTime();
+    
+    int hours = hour(timestamp);
+    int minutes = minute(timestamp);
+    int seconds = second(timestamp);
+    hours = (hours + 7) % 24;
+
+    // Display the formatted time
+    displayTime= twoDigits(hours) + ":" + twoDigits(minutes) + ":" + twoDigits(seconds);
 
     parentPath= databasePath + "/" + String(timestamp);
 
